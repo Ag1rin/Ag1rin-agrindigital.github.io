@@ -1,0 +1,73 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build config.js from secrets
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          ADMIN_USERNAME: ${{ vars.ADMIN_USERNAME }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          ADMIN_PASSWORD_HASH: ${{ secrets.ADMIN_PASSWORD_HASH }}
+        run: |
+          set -euo pipefail
+
+          missing=""
+          [ -n "$SUPABASE_URL" ] || missing="$missing SUPABASE_URL"
+          [ -n "$SUPABASE_ANON_KEY" ] || missing="$missing SUPABASE_ANON_KEY"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secrets:$missing"
+            exit 1
+          fi
+
+          hash="$ADMIN_PASSWORD_HASH"
+          if [ -z "$hash" ]; then
+            if [ -z "$ADMIN_PASSWORD" ]; then
+              echo "::error::Set either ADMIN_PASSWORD or ADMIN_PASSWORD_HASH secret"
+              exit 1
+            fi
+            hash="$(printf %s "$ADMIN_PASSWORD" | sha256sum | cut -d' ' -f1)"
+          fi
+          hash="$(printf %s "$hash" | tr '[:upper:]' '[:lower:]')"
+
+          HASH="$hash" node -e '
+            const fs = require("fs");
+            const cfg = {
+              supabaseUrl: process.env.SUPABASE_URL.replace(/\/+$/, ""),
+              supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
+              adminUsername: process.env.ADMIN_USERNAME || "agrin",
+              adminPasswordHash: process.env.HASH
+            };
+            fs.writeFileSync("config.js", "window.SITE_CONFIG = " + JSON.stringify(cfg, null, 2) + ";\n");
+          '
+          echo "config.js written ($(wc -c < config.js) bytes)"
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - id: deploy
+        uses: actions/deploy-pages@v4
