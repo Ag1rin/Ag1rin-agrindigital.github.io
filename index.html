@@ -112,6 +112,7 @@ p{color:var(--text-dim);margin:0;}
 .section{padding:96px 0;border-top:1px solid var(--border);}
 .section-head{max-width:640px;margin-bottom:52px;}
 .section-head p{margin-top:14px;font-size:16.5px;}
+#form.section{padding-bottom:72px;}
 
 button,a,.check-item,.icon-btn,.nav-cta,.btn-primary,.btn-ghost{
   -webkit-tap-highlight-color:transparent;
@@ -153,8 +154,11 @@ button,a,.check-item,.icon-btn,.nav-cta,.btn-primary,.btn-ghost{
 .icon-btn:hover{transform:rotate(18deg);border-color:var(--accent);}
 .icon-btn svg{width:17px;height:17px;}
 .nav-cta{
-  font-size:13.5px;font-weight:700;background:var(--accent);color:var(--ink-900);padding:9px 18px;border-radius:10px;
+  font-size:13.5px;font-weight:700;background:var(--accent-2);color:var(--ink-900);padding:9px 18px;border-radius:10px;
+  transition:transform .25s ease, box-shadow .25s ease, filter .25s ease;
+  box-shadow:0 10px 22px -14px color-mix(in srgb, var(--accent-2) 70%, transparent);
 }
+.nav-cta:hover{transform:translateY(-1px);filter:brightness(1.05);}
 
 /* ============ HERO ============ */
 .hero{padding:74px 0 40px;position:relative;overflow:hidden;}
@@ -434,9 +438,27 @@ html[dir="rtl"] .field select{
 .reg-done p{color:var(--text-dim);font-size:14.5px;max-width:420px;margin:0 auto;line-height:1.7;}
 
 /* ============ FOOTER ============ */
-footer{padding:44px 0;border-top:1px solid var(--border);}
-.footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;}
-.footer-inner p{font-size:13px;}
+footer{
+  margin-top:28px;
+  padding:56px 0 48px;
+  border-top:1px solid var(--border);
+  background:color-mix(in srgb, var(--surface) 72%, transparent);
+}
+.footer-inner{
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px 28px;
+}
+.footer-brand{display:flex;align-items:center;gap:14px;min-width:0;}
+.footer-brand img{
+  width:42px;height:42px;border-radius:50%;flex:none;
+  border:1.5px solid var(--border);background:var(--surface-2);
+}
+.footer-copy{min-width:0;}
+.footer-copy .footer-title{color:var(--text);font-size:13.5px;font-weight:600;line-height:1.55;}
+.footer-copy .footer-meta{margin-top:5px;font-size:12.5px;color:var(--text-dim);line-height:1.55;}
+.footer-ver{
+  font-family:var(--font-mono);font-size:12px;color:var(--text-dim);
+  padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:var(--surface);
+}
 
 /* reveal on scroll — only hide after JS marks page ready (avoids blank stuck page) */
 .js-ready .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease, transform .6s ease;}
@@ -464,6 +486,7 @@ footer{padding:44px 0;border-top:1px solid var(--border);}
     padding-right:max(18px, env(safe-area-inset-right));
   }
   .section{padding:56px 0;}
+  #form.section{padding-bottom:64px;}
   .section-head{margin-bottom:28px;}
   .section-head p{font-size:15px;margin-top:10px;line-height:1.7;}
   h2{font-size:clamp(24px,6.4vw,32px);line-height:1.3;}
@@ -599,8 +622,12 @@ footer{padding:44px 0;border-top:1px solid var(--border);}
   .reg-done h3{font-size:19px;}
   .reg-done p{font-size:14px;}
 
-  .footer-inner{flex-direction:column;align-items:flex-start;gap:14px;}
-  footer{padding:28px 0 max(28px, env(safe-area-inset-bottom));}
+  .footer-inner{flex-direction:column;align-items:flex-start;gap:16px;}
+  footer{margin-top:20px;padding:40px 0 max(36px, env(safe-area-inset-bottom));}
+  .footer-brand{align-items:flex-start;}
+  .footer-brand img{width:38px;height:38px;margin-top:2px;}
+  .footer-copy .footer-title{font-size:13px;}
+  .footer-copy .footer-meta{font-size:12px;}
 
   /* sticky register CTA — mobile only */
   .mobile-cta{
@@ -611,9 +638,12 @@ footer{padding:44px 0;border-top:1px solid var(--border);}
     border-top:1px solid var(--border);
     gap:10px;
   }
-  .mobile-cta .btn-primary{
+  .mobile-cta .btn-primary,
+  .mobile-cta .nav-cta{
     flex:1;min-height:48px;display:inline-flex;align-items:center;justify-content:center;
     text-align:center;border-radius:14px;
+    background:var(--accent-2);color:var(--ink-900);
+    box-shadow:0 12px 26px -14px color-mix(in srgb, var(--accent-2) 70%, transparent);
   }
   body{padding-bottom:76px;}
   body.is-registered{padding-bottom:0;}
@@ -938,19 +968,19 @@ footer{padding:44px 0;border-top:1px solid var(--border);}
 <!-- ============ FOOTER ============ -->
 <footer class="container">
   <div class="footer-inner">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <img src="assets/logo.png" alt="کتاب‌شهر" style="width:38px;height:38px;border-radius:50%;">
-      <div>
-        <p data-i18n="footer_text" style="color:var(--text)"></p>
-        <p data-i18n="footer_partner" style="margin-top:4px;font-size:12.5px;"></p>
+    <div class="footer-brand">
+      <img src="assets/logo.png" alt="کتاب‌شهر">
+      <div class="footer-copy">
+        <p class="footer-title" data-i18n="footer_text"></p>
+        <p class="footer-meta" data-i18n="footer_partner"></p>
       </div>
     </div>
-    <p class="mono" style="opacity:.6">v1.3</p>
+    <span class="footer-ver">v1.3</span>
   </div>
 </footer>
 
 <div class="mobile-cta" id="mobileCta">
-  <a href="#form" class="btn-primary" data-i18n="nav_cta"></a>
+  <a href="#form" class="nav-cta" data-i18n="nav_cta"></a>
 </div>
 
 <script src="config.js"></script>
