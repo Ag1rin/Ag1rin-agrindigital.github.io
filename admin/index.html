@@ -79,6 +79,9 @@ th{background:var(--surface-2);color:var(--text-dim);font-weight:600;position:st
 tr:last-child td{border-bottom:none;}
 .empty{padding:36px;text-align:center;color:var(--text-dim);}
 .badge{display:inline-block;padding:2px 8px;border-radius:999px;background:color-mix(in srgb,var(--teal) 18%,transparent);color:var(--teal);font-size:11px;}
+.badge-tier1{background:color-mix(in srgb,var(--accent) 20%,transparent);color:var(--accent);}
+.badge-tier2{background:color-mix(in srgb,var(--teal) 18%,transparent);color:var(--teal);}
+.badge-over{background:color-mix(in srgb,var(--red-soft) 18%,transparent);color:var(--red-soft);}
 .note-cell{max-width:220px;white-space:pre-wrap;word-break:break-word;}
 .warn{
   display:none;margin-bottom:16px;padding:14px 16px;border-radius:12px;
@@ -175,6 +178,7 @@ tr:last-child td{border-bottom:none;}
           <tr>
             <th>#</th>
             <th>نام</th>
+            <th>مرحله</th>
             <th>سن</th>
             <th>تلفن</th>
             <th>ایمیل</th>
@@ -188,7 +192,7 @@ tr:last-child td{border-bottom:none;}
           </tr>
         </thead>
         <tbody id="tbody">
-          <tr><td colspan="12" class="empty">در حال بارگذاری…</td></tr>
+          <tr><td colspan="13" class="empty">در حال بارگذاری…</td></tr>
         </tbody>
       </table>
     </div>
@@ -335,6 +339,31 @@ async function verifyLogin(username, password){
   return false;
 }
 
+const SEATS_TIER1 = 10;
+const SEATS_TOTAL = 20;
+
+function tierInfo(rank){
+  if(rank < SEATS_TIER1){
+    return { label: '10 نفر اول · ۱٫۷۰۰٫۰۰۰', cls: 'badge-tier1' };
+  }
+  if(rank < SEATS_TOTAL){
+    return { label: '10 نفر بعدی · ۲٫۵۰۰٫۰۰۰', cls: 'badge-tier2' };
+  }
+  return { label: 'خارج از ظرفیت', cls: 'badge-over' };
+}
+
+function buildTierMap(rows){
+  const ordered = [...rows].sort((a,b)=>{
+    const ta = new Date(a.created_at || 0).getTime();
+    const tb = new Date(b.created_at || 0).getTime();
+    if(ta !== tb) return ta - tb;
+    return String(a.id || '').localeCompare(String(b.id || ''));
+  });
+  const map = new Map();
+  ordered.forEach((r, idx)=> map.set(r.id, { rank: idx, ...tierInfo(idx) }));
+  return map;
+}
+
 function renderRows(rows){
   rowsCache = rows || [];
   document.getElementById('statTotal').textContent = String(rowsCache.length);
@@ -344,14 +373,19 @@ function renderRows(rows){
   document.getElementById('statToday').textContent = String(todayCount);
 
   if(!rowsCache.length){
-    tbody.innerHTML = `<tr><td colspan="12" class="empty">هنوز ثبت‌نامی ثبت نشده است.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="13" class="empty">هنوز ثبت‌نامی ثبت نشده است.</td></tr>`;
     return;
   }
 
-  tbody.innerHTML = rowsCache.map((r,i)=>`
+  const tierMap = buildTierMap(rowsCache);
+
+  tbody.innerHTML = rowsCache.map((r,i)=>{
+    const tier = tierMap.get(r.id) || tierInfo(999);
+    return `
     <tr>
       <td>${i+1}</td>
       <td><b>${escapeHtml(r.name || '')}</b></td>
+      <td><span class="badge ${tier.cls}">${escapeHtml(tier.label)}</span></td>
       <td>${r.age ?? '—'}</td>
       <td dir="ltr">${escapeHtml(r.phone || '')}</td>
       <td dir="ltr">${escapeHtml(r.email || '—')}</td>
@@ -362,8 +396,8 @@ function renderRows(rows){
       <td><span class="badge">${escapeHtml(r.lang || '—')}</span></td>
       <td class="note-cell">${escapeHtml(r.notes || '—')}</td>
       <td>${fmtDate(r.created_at)}</td>
-    </tr>
-  `).join('');
+    </tr>`;
+  }).join('');
 }
 
 function renderWaitlist(rows){
@@ -418,7 +452,7 @@ async function loadRows(){
   }catch(err){
     console.error(err);
     policyWarn.classList.add('show');
-    tbody.innerHTML = `<tr><td colspan="12" class="empty">خواندن داده ممکن نشد. SQL سیاست‌ها را اجرا کنید.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="13" class="empty">خواندن داده ممکن نشد. SQL سیاست‌ها را اجرا کنید.</td></tr>`;
     document.getElementById('waitBody').innerHTML = `<tr><td colspan="5" class="empty">خواندن لیست انتظار ممکن نشد.</td></tr>`;
     dashMsg.textContent = 'خطا در خواندن داده';
     dashMsg.className = 'msg err';
@@ -486,11 +520,12 @@ document.getElementById('csvBtn').addEventListener('click', ()=>{
   }
   const headers = waitActive
     ? ['name','phone','lang','created_at']
-    : ['name','age','phone','email','city','experience','days','times','lang','notes','created_at'];
+    : ['name','tier','age','phone','email','city','experience','days','times','lang','notes','created_at'];
+  const tierMap = waitActive ? null : buildTierMap(rows);
   const lines = [headers.join(',')];
   rows.forEach(r=>{
     const vals = headers.map(h=>{
-      let v = r[h];
+      let v = h === 'tier' ? (tierMap.get(r.id)?.label || '') : r[h];
       if(Array.isArray(v)) v = v.join('|');
       if(v == null) v = '';
       return `"${String(v).replace(/"/g,'""')}"`;
