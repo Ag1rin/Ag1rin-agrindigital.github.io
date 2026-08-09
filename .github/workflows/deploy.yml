@@ -41,7 +41,15 @@ jobs:
             exit 1
           fi
 
-          hash="$ADMIN_PASSWORD_HASH"
+          # Whitespace is never part of a hex digest, so trimming it is safe here.
+          # The password itself is used verbatim, since spaces may be intentional.
+          hash="$(printf %s "$ADMIN_PASSWORD_HASH" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')"
+
+          if [ -n "$hash" ] && ! printf %s "$hash" | grep -Eq '^[0-9a-f]{64}$'; then
+            echo "::error::ADMIN_PASSWORD_HASH is not a 64-char SHA-256 hex digest. Delete that secret to hash ADMIN_PASSWORD automatically, or set a valid digest."
+            exit 1
+          fi
+
           if [ -z "$hash" ]; then
             if [ -z "$ADMIN_PASSWORD" ]; then
               echo "::error::Set either ADMIN_PASSWORD or ADMIN_PASSWORD_HASH secret"
@@ -49,7 +57,6 @@ jobs:
             fi
             hash="$(printf %s "$ADMIN_PASSWORD" | sha256sum | cut -d' ' -f1)"
           fi
-          hash="$(printf %s "$hash" | tr '[:upper:]' '[:lower:]')"
 
           HASH="$hash" node -e '
             const fs = require("fs");
