@@ -1,1 +1,1 @@
-A website
+A website for students.
