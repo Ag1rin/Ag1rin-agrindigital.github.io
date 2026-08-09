@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پنل ادمین | ثبت‌نام‌ها</title>
+<link rel="icon" href="../assets/logo.png" type="image/png">
+<style>
+@font-face{font-family:'Vazirmatn';src:url('../fonts/Vazirmatn-Regular.ttf') format('truetype');font-weight:100 450;font-display:swap;}
+@font-face{font-family:'Vazirmatn';src:url('../fonts/Vazirmatn-Medium.ttf') format('truetype');font-weight:451 550;font-display:swap;}
+@font-face{font-family:'Vazirmatn';src:url('../fonts/Vazirmatn-SemiBold.ttf') format('truetype');font-weight:551 900;font-display:swap;}
+:root{
+  --ink-900:#0F1417;--ink-800:#171D21;--ink-700:#202830;
+  --copper:#D8935A;--teal:#5FC3B0;--red-soft:#D8735A;
+  --radius-m:16px;--radius-l:26px;--maxw:1100px;
+  --font:'Vazirmatn',sans-serif;
+}
+html.dark{
+  --bg:var(--ink-900);--surface:var(--ink-800);--surface-2:var(--ink-700);
+  --text:#ECEEE9;--text-dim:#9BA8A4;--border:#2A3339;--accent:var(--copper);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.7;min-height:100%;}
+a{color:var(--accent);text-decoration:none;}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:24px 18px 48px;}
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-l);
+  padding:28px;box-shadow:0 20px 60px -20px rgba(0,0,0,.55);
+}
+.login-wrap{min-height:100vh;display:grid;place-items:center;padding:24px 16px;
+  background:
+    radial-gradient(900px 420px at 80% -10%, color-mix(in srgb, var(--accent) 18%, transparent), transparent),
+    radial-gradient(700px 360px at 0% 100%, color-mix(in srgb, var(--teal) 14%, transparent), transparent),
+    var(--bg);
+}
+.login-card{width:100%;max-width:420px;}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:22px;}
+.brand img{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);}
+.brand b{display:block;font-size:17px;}
+.brand span{font-size:12px;color:var(--text-dim);}
+h1{font-size:24px;margin:0 0 8px;}
+.sub{color:var(--text-dim);font-size:14px;margin:0 0 22px;}
+.field{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+.field label{font-size:13px;font-weight:600;}
+.field input{
+  background:var(--surface-2);border:1px solid var(--border);border-radius:10px;
+  padding:12px 14px;color:var(--text);font-family:var(--font);font-size:16px;outline:none;width:100%;
+}
+.field input:focus{border-color:var(--accent);}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--accent);color:var(--ink-900);font-weight:700;border:none;border-radius:12px;
+  padding:12px 18px;font-size:15px;font-family:var(--font);cursor:pointer;width:100%;
+}
+.btn:disabled{opacity:.55;cursor:not-allowed;}
+.btn-ghost{
+  background:transparent;color:var(--text);border:1px solid var(--border);width:auto;
+}
+.msg{margin-top:14px;font-size:14px;font-weight:600;min-height:1.4em;}
+.msg.err{color:var(--red-soft);}
+.msg.ok{color:var(--teal);}
+.top{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  margin-bottom:20px;
+}
+.top h1{margin:0;font-size:22px;}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.stat{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:12px 16px;min-width:120px;
+}
+.stat b{display:block;font-size:22px;}
+.stat span{font-size:12px;color:var(--text-dim);}
+.table-wrap{overflow:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:var(--radius-m);}
+table{width:100%;border-collapse:collapse;min-width:860px;background:var(--surface);}
+th,td{padding:12px 14px;border-bottom:1px solid var(--border);text-align:right;font-size:13.5px;vertical-align:top;}
+th{background:var(--surface-2);color:var(--text-dim);font-weight:600;position:sticky;top:0;}
+tr:last-child td{border-bottom:none;}
+.empty{padding:36px;text-align:center;color:var(--text-dim);}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;background:color-mix(in srgb,var(--teal) 18%,transparent);color:var(--teal);font-size:11px;}
+.note-cell{max-width:220px;white-space:pre-wrap;word-break:break-word;}
+.warn{
+  display:none;margin-bottom:16px;padding:14px 16px;border-radius:12px;
+  border:1px dashed var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);font-size:13.5px;
+}
+.warn.show{display:block;}
+.warn code, .warn pre{
+  display:block;margin-top:10px;padding:12px;border-radius:10px;background:var(--ink-900);
+  overflow:auto;font-size:12px;direction:ltr;text-align:left;white-space:pre-wrap;
+}
+.hidden{display:none !important;}
+@media (max-width:640px){
+  .card{padding:18px;}
+  .top{align-items:stretch;}
+  .top-actions{width:100%;}
+  .top-actions .btn{flex:1;}
+  .stat{min-width:calc(50% - 8px);}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<section id="loginView" class="login-wrap">
+  <div class="card login-card">
+    <div class="brand">
+      <img src="../assets/logo.png" alt="">
+      <div>
+        <b>پنل مدیریت ثبت‌نام</b>
+        <span>خولی کۆمپیوتەر</span>
+      </div>
+    </div>
+    <h1>ورود ادمین</h1>
+    <p class="sub">برای دیدن لیست ثبت‌نام‌کنندگان وارد شوید.</p>
+    <form id="loginForm">
+      <div class="field">
+        <label for="username">نام کاربری</label>
+        <input id="username" name="username" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="password">رمز عبور</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+      </div>
+      <button class="btn" type="submit" id="loginBtn">ورود</button>
+      <div class="msg" id="loginMsg"></div>
+    </form>
+  </div>
+</section>
+
+<!-- DASHBOARD -->
+<section id="dashView" class="wrap hidden">
+  <div class="top">
+    <div>
+      <h1>ثبت‌نام‌کنندگان</h1>
+      <p class="sub" style="margin:4px 0 0">داده‌ها از Supabase خوانده می‌شوند</p>
+    </div>
+    <div class="top-actions">
+      <button class="btn btn-ghost" type="button" id="refreshBtn">بروزرسانی</button>
+      <button class="btn btn-ghost" type="button" id="csvBtn">خروجی CSV</button>
+      <button class="btn btn-ghost" type="button" id="logoutBtn">خروج</button>
+    </div>
+  </div>
+
+  <div class="warn" id="policyWarn">
+    برای کار کردن فرم و پنل، این SQL را یک‌بار در Supabase → SQL Editor اجرا کنید:
+    <pre id="policySql"></pre>
+    <a href="https://supabase.com/dashboard/project/wmlsuujrtzoevrduzuew/sql/new" target="_blank" rel="noopener">باز کردن SQL Editor</a>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b id="statTotal">0</b><span>کل ثبت‌نام‌ها</span></div>
+    <div class="stat"><b id="statToday">0</b><span>امروز</span></div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>نام</th>
+          <th>سن</th>
+          <th>تلفن</th>
+          <th>ایمیل</th>
+          <th>شهر</th>
+          <th>تجربه</th>
+          <th>روزها</th>
+          <th>ساعت‌ها</th>
+          <th>زبان</th>
+          <th>توضیحات</th>
+          <th>تاریخ</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr><td colspan="12" class="empty">در حال بارگذاری…</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="msg" id="dashMsg"></div>
+</section>
+
+<script src="../config.js"></script>
+<script>
+const SESSION_KEY = 'agrin-admin-ok';
+const POLICY_SQL = `-- run once in Supabase SQL Editor
+grant usage on schema public to anon, authenticated;
+grant insert on table public.registrations to anon;
+grant select on table public.registrations to anon, authenticated;
+
+drop policy if exists "anon_insert_registrations" on public.registrations;
+create policy "anon_insert_registrations"
+  on public.registrations for insert to anon with check (true);
+
+drop policy if exists "authenticated_select_registrations" on public.registrations;
+drop policy if exists "anon_select_registrations" on public.registrations;
+create policy "anon_select_registrations"
+  on public.registrations for select to anon, authenticated using (true);`;
+
+document.getElementById('policySql').textContent = POLICY_SQL;
+
+const cfg = window.SITE_CONFIG || {};
+const loginView = document.getElementById('loginView');
+const dashView = document.getElementById('dashView');
+const loginMsg = document.getElementById('loginMsg');
+const dashMsg = document.getElementById('dashMsg');
+const tbody = document.getElementById('tbody');
+const policyWarn = document.getElementById('policyWarn');
+
+let rowsCache = [];
+
+function showDash(show){
+  loginView.classList.toggle('hidden', show);
+  dashView.classList.toggle('hidden', !show);
+}
+
+function fmtDate(iso){
+  if(!iso) return '—';
+  try{
+    return new Date(iso).toLocaleString('fa-IR', { dateStyle:'medium', timeStyle:'short' });
+  }catch{ return iso; }
+}
+
+function arrText(v){
+  if(Array.isArray(v)) return v.join('، ') || '—';
+  return v || '—';
+}
+
+function escapeHtml(s){
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function sha256Hex(text){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function verifyLogin(username, password){
+  const expectedUser = String(cfg.adminUsername || 'agrin').toLowerCase();
+  if(username.toLowerCase() !== expectedUser) return false;
+
+  if(cfg.adminPasswordHash){
+    const hash = await sha256Hex(password);
+    return hash === String(cfg.adminPasswordHash).toLowerCase();
+  }
+  if(cfg.adminPassword){
+    return password === String(cfg.adminPassword);
+  }
+  return false;
+}
+
+function renderRows(rows){
+  rowsCache = rows || [];
+  document.getElementById('statTotal').textContent = String(rowsCache.length);
+
+  const start = new Date(); start.setHours(0,0,0,0);
+  const todayCount = rowsCache.filter(r => r.created_at && new Date(r.created_at) >= start).length;
+  document.getElementById('statToday').textContent = String(todayCount);
+
+  if(!rowsCache.length){
+    tbody.innerHTML = `<tr><td colspan="12" class="empty">هنوز ثبت‌نامی ثبت نشده است.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rowsCache.map((r,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td><b>${escapeHtml(r.name || '')}</b></td>
+      <td>${r.age ?? '—'}</td>
+      <td dir="ltr">${escapeHtml(r.phone || '')}</td>
+      <td dir="ltr">${escapeHtml(r.email || '—')}</td>
+      <td>${escapeHtml(r.city || '—')}</td>
+      <td>${escapeHtml(r.experience || '—')}</td>
+      <td>${escapeHtml(arrText(r.days))}</td>
+      <td>${escapeHtml(arrText(r.times))}</td>
+      <td><span class="badge">${escapeHtml(r.lang || '—')}</span></td>
+      <td class="note-cell">${escapeHtml(r.notes || '—')}</td>
+      <td>${fmtDate(r.created_at)}</td>
+    </tr>
+  `).join('');
+}
+
+async function loadRows(){
+  dashMsg.textContent = '';
+  dashMsg.className = 'msg';
+
+  if(!cfg.supabaseUrl || !cfg.supabaseAnonKey){
+    dashMsg.textContent = 'config.js ناقص است.';
+    dashMsg.className = 'msg err';
+    return;
+  }
+
+  try{
+    const url = cfg.supabaseUrl.replace(/\/$/, '') + '/rest/v1/registrations?select=*&order=created_at.desc';
+    const res = await fetch(url, {
+      headers: {
+        apikey: cfg.supabaseAnonKey,
+        Authorization: 'Bearer ' + cfg.supabaseAnonKey
+      }
+    });
+    if(!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    policyWarn.classList.remove('show');
+    renderRows(data || []);
+  }catch(err){
+    console.error(err);
+    policyWarn.classList.add('show');
+    tbody.innerHTML = `<tr><td colspan="12" class="empty">خواندن داده ممکن نشد. SQL سیاست‌ها را اجرا کنید.</td></tr>`;
+    dashMsg.textContent = 'خطا در خواندن داده';
+    dashMsg.className = 'msg err';
+  }
+}
+
+function ensureSession(){
+  if(sessionStorage.getItem(SESSION_KEY) === '1'){
+    showDash(true);
+    loadRows();
+    return true;
+  }
+  showDash(false);
+  return false;
+}
+
+document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  loginMsg.textContent = '';
+  loginMsg.className = 'msg';
+
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+
+  try{
+    if(!cfg.adminPassword && !cfg.adminPasswordHash){
+      loginMsg.textContent = 'رمز ادمین تنظیم نشده. Secret به نام ADMIN_PASSWORD را در GitHub بگذار.';
+      loginMsg.className = 'msg err';
+      return;
+    }
+    const ok = await verifyLogin(username, password);
+    if(!ok){
+      loginMsg.textContent = 'نام کاربری یا رمز عبور اشتباه است.';
+      loginMsg.className = 'msg err';
+      return;
+    }
+    sessionStorage.setItem(SESSION_KEY, '1');
+    showDash(true);
+    await loadRows();
+  }finally{
+    btn.disabled = false;
+  }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+  sessionStorage.removeItem(SESSION_KEY);
+  rowsCache = [];
+  showDash(false);
+});
+
+document.getElementById('refreshBtn').addEventListener('click', loadRows);
+
+document.getElementById('csvBtn').addEventListener('click', ()=>{
+  if(!rowsCache.length){
+    dashMsg.textContent = 'داده‌ای برای خروجی نیست.';
+    dashMsg.className = 'msg err';
+    return;
+  }
+  const headers = ['name','age','phone','email','city','experience','days','times','lang','notes','created_at'];
+  const lines = [headers.join(',')];
+  rowsCache.forEach(r=>{
+    const vals = headers.map(h=>{
+      let v = r[h];
+      if(Array.isArray(v)) v = v.join('|');
+      if(v == null) v = '';
+      return `"${String(v).replace(/"/g,'""')}"`;
+    });
+    lines.push(vals.join(','));
+  });
+  const blob = new Blob([lines.join('\n')], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'registrations.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+ensureSession();
+</script>
+</body>
+</html>
