@@ -1121,19 +1121,21 @@ fa: {
   price_eyebrow:"هزینه دوره",
   price_title:"هزینه ثبت‌نام",
   price_sub:"ظرفیت هر دوره محدود است؛ هرچه زودتر ثبت‌نام کنید، هزینه کمتری پرداخت می‌کنید.",
-  price1_badge:"۱۵ نفر اول",
+  price1_badge:"۱۰ نفر اول",
   price1_amount:"۱,۳۰۰,۰۰۰",
-  price1_desc:"برای ۱۵ نفری که زودتر ثبت‌نام کنند.",
-  price2_badge:"از نفر ۱۶ به بعد",
+  price1_desc:"برای ۱۰ نفری که زودتر ثبت‌نام کنند.",
+  price2_badge:"۱۰ نفر بعدی",
   price2_amount:"۲,۰۰۰,۰۰۰",
-  price2_desc:"برای ثبت‌نام‌کنندگان بعد از تکمیل ظرفیت ۱۵ نفر اول.",
+  price2_desc:"برای ۱۰ نفری که بعد از تکمیل ظرفیت ۱۰ نفر اول ثبت‌نام کنند.",
   price_unit:"تومان",
   price1_full_badge:"ظرفیت تکمیل شد",
+  price2_full_badge:"ظرفیت تکمیل شد",
   pay_note:"فعلاً فقط کافی است فرم زیر را پر کنید تا جای خود را رزرو کنید؛ <b>مبلغ دوره بعداً و به‌صورت حضوری</b> در جلسه اول دریافت می‌شود.",
   reg_price_title:"هزینه دوره برای شما",
-  seats_left_label:"صندلی خالی از ظرفیت 15 نفر اول",
-  reg_price_full_title:"ظرفیت ۱۵ نفر اول تکمیل شده",
-  reg_price_full_note:"هزینه دوره برای شما به‌صورت جداگانه محاسبه و به شما اعلام خواهد شد.",
+  seats_left_label:"صندلی خالی از ظرفیت ۱۰ نفر اول",
+  seats_left_label_t2:"صندلی خالی از ظرفیت ۱۰ نفر بعدی",
+  reg_price_full_title:"ظرفیت این مرحله تکمیل شده",
+  reg_price_full_note:"ظرفیت هر دو مرحله تکمیل شده است؛ در صورت باز شدن ظرفیت جدید به شما اطلاع می‌دهیم.",
 
   form_eyebrow:"ثبت‌نام",
   form_title:"صندلی خودتان را رزرو کنید",
@@ -1251,19 +1253,21 @@ ckb: {
   price_eyebrow:"تێچووی خول",
   price_title:"تێچووی تۆمارکردن",
   price_sub:"جێگاکانی خول سنووردارن؛ هەرچەندە زووتر تۆمار بکەیت، تێچووی کەمتر دەدەیت.",
-  price1_badge:"15 کەسی یەکەم",
+  price1_badge:"10 کەسی یەکەم",
   price1_amount:"١,٣٠٠,٠٠٠",
-  price1_desc:"بۆ ئەو 15 کەسەی زووتر تۆمار دەکەن.",
-  price2_badge:"لە کەسی 16 بەدواوە",
+  price1_desc:"بۆ ئەو 10 کەسەی زووتر تۆمار دەکەن.",
+  price2_badge:"10 کەسی دواتر",
   price2_amount:"٢,٠٠٠,٠٠٠",
-  price2_desc:"بۆ تۆمارکەرانی دوای پڕبوونەوەی جێگای 15 کەسی یەکەم.",
+  price2_desc:"بۆ ئەو 10 کەسەی دوای پڕبوونەوەی جێگای 10 کەسی یەکەم تۆمار دەکەن.",
   price_unit:"تومان",
   price1_full_badge:"جێگا پڕبوو",
+  price2_full_badge:"جێگا پڕبوو",
   pay_note:"ئێستا تەنها پێویستە فۆرمی خوارەوە پڕبکەیتەوە تاکو جێگای خۆت دیاری بکەیت؛ <b>بەهای خولەکە دواتر و ڕووبەڕوو</b> لە دانیشتنی یەکەمدا وەردەگیرێت.",
   reg_price_title:"تێچووی خول بۆ تۆ",
-  seats_left_label:"جێگای بەتاڵ لە 15 کەسی یەکەم",
-  reg_price_full_title:"جێگای 15 کەسی یەکەم پڕبوو",
-  reg_price_full_note:"تێچووی خولەکە بۆ تۆ بە تایبەتی حیساب دەکرێت و ڕادەگەیەندرێت.",
+  seats_left_label:"جێگای بەتاڵ لە 10 کەسی یەکەم",
+  seats_left_label_t2:"جێگای بەتاڵ لە 10 کەسی دواتر",
+  reg_price_full_title:"جێگای ئەم قۆناغە پڕبوو",
+  reg_price_full_note:"جێگای هەردوو قۆناغ پڕبووە؛ ئەگەر جێگای نوێ کرایەوە ئاگادارت دەکەینەوە.",
 
   form_eyebrow:"تۆمارکردن",
   form_title:"جێگای خۆت دیاری بکە",
@@ -1302,7 +1306,9 @@ let currentLang = 'fa';
    تعداد ثبت‌نام‌ها از Supabase خوانده می‌شود (تابع registration_count).
    اگر config تنظیم نشده باشد، از seatsFilledFallback استفاده می‌شود.
    ============================================================ */
-const SEATS_TOTAL = 15;
+const SEATS_TIER1 = 10; // ۱۰ نفر اول — ۱,۳۰۰,۰۰۰
+const SEATS_TIER2 = 10; // ۱۰ نفر بعدی — ۲,۰۰۰,۰۰۰
+const SEATS_TOTAL = SEATS_TIER1 + SEATS_TIER2;
 let seatsFilled = 0;
 const seatsFilledFallback = 0; // فقط وقتی Supabase وصل نیست
 
@@ -1412,20 +1418,26 @@ function bindCheckItems(){
 /* ============ PRICING / SEATS RENDER ============ */
 function renderPricing(lang){
   const d = DICT[lang];
-  const isFull = seatsFilled >= SEATS_TOTAL;
-  const seatsLeft = Math.max(SEATS_TOTAL - seatsFilled, 0);
+  const tier1Full = seatsFilled >= SEATS_TIER1;
+  const allFull = seatsFilled >= SEATS_TOTAL;
+  const tier1Left = Math.max(SEATS_TIER1 - seatsFilled, 0);
+  const tier2Left = Math.max(SEATS_TOTAL - Math.max(seatsFilled, SEATS_TIER1), 0);
 
   const card1 = document.getElementById('priceCard1');
   const card2 = document.getElementById('priceCard2');
   const badge1 = document.getElementById('price1BadgeEl');
-  card1.classList.toggle('is-full', isFull);
-  card1.classList.toggle('featured', !isFull);
-  card2.classList.toggle('featured', isFull);
-  badge1.textContent = isFull ? d.price1_full_badge : d.price1_badge;
+  const badge2 = card2.querySelector('.price-badge');
+
+  card1.classList.toggle('is-full', tier1Full);
+  card1.classList.toggle('featured', !tier1Full);
+  card2.classList.toggle('is-full', allFull);
+  card2.classList.toggle('featured', tier1Full && !allFull);
+  badge1.textContent = tier1Full ? d.price1_full_badge : d.price1_badge;
+  if(badge2) badge2.textContent = allFull ? (d.price2_full_badge || d.price1_full_badge) : d.price2_badge;
 
   const box = document.getElementById('regPriceBox');
-  box.classList.toggle('is-full', isFull);
-  if(isFull){
+  box.classList.toggle('is-full', allFull);
+  if(allFull){
     box.innerHTML = `
       <div>
         <div class="rp-label">${d.reg_price_title}</div>
@@ -1433,13 +1445,21 @@ function renderPricing(lang){
       </div>
       <div class="rp-seats">${d.reg_price_full_note}</div>
     `;
+  } else if(tier1Full){
+    box.innerHTML = `
+      <div>
+        <div class="rp-label">${d.reg_price_title}</div>
+        <div class="rp-amount">${d.price2_amount}<span class="unit">${d.price_unit}</span></div>
+      </div>
+      <div class="rp-seats">${tier2Left} ${d.seats_left_label_t2}</div>
+    `;
   } else {
     box.innerHTML = `
       <div>
         <div class="rp-label">${d.reg_price_title}</div>
         <div class="rp-amount">${d.price1_amount}<span class="unit">${d.price_unit}</span></div>
       </div>
-      <div class="rp-seats">${seatsLeft} ${d.seats_left_label}</div>
+      <div class="rp-seats">${tier1Left} ${d.seats_left_label}</div>
     `;
   }
 }
