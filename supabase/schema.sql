@@ -18,6 +18,10 @@ create table if not exists public.registrations (
   lang text
 );
 
+-- One registration per phone (normalized digits like 09xxxxxxxxx)
+create unique index if not exists registrations_phone_unique
+  on public.registrations (phone);
+
 alter table public.registrations enable row level security;
 
 grant usage on schema public to anon, authenticated;

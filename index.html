@@ -417,6 +417,20 @@ html[dir="rtl"] .field select{
 #formMsg{font-size:14px;font-weight:600;}
 #formMsg.ok{color:var(--accent-2);}
 #formMsg.err{color:var(--red-soft);}
+.reg-done{
+  display:none;text-align:center;padding:28px 12px 8px;
+}
+.form-panel.is-registered .reg-done{display:block;}
+.form-panel.is-registered #regForm{display:none;}
+.reg-done-icon{
+  width:56px;height:56px;margin:0 auto 16px;border-radius:50%;
+  display:grid;place-items:center;
+  background:color-mix(in srgb, var(--accent-2) 18%, transparent);
+  color:var(--accent-2);
+}
+.reg-done-icon svg{width:28px;height:28px;}
+.reg-done h3{font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--text);margin:0 0 8px;}
+.reg-done p{color:var(--text-dim);font-size:14.5px;max-width:420px;margin:0 auto;line-height:1.7;}
 
 /* ============ FOOTER ============ */
 footer{padding:44px 0;border-top:1px solid var(--border);}
@@ -750,8 +764,15 @@ footer{padding:44px 0;border-top:1px solid var(--border);}
     <p data-i18n="form_sub"></p>
   </div>
 
-  <div class="form-panel">
+  <div class="form-panel" id="formPanel">
     <div class="reg-price-box" id="regPriceBox"></div>
+    <div class="reg-done" id="regDone" aria-live="polite">
+      <div class="reg-done-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <h3 data-i18n="msg_already_title"></h3>
+      <p data-i18n="msg_already_body"></p>
+    </div>
     <form id="regForm" name="course-registration">
       <input class="hp-field" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
 
@@ -961,7 +982,10 @@ fa: {
   footer_text:"دوره مفاهیم پایه کامپیوتر و برنامه‌نویسی — کلاس حضوری",
   footer_partner:"به همکاری کتاب‌شهر، واقع در کمربندی شهر بانه",
   msg_ok:"ثبت‌نام شما با موفقیت ارسال شد. به‌زودی تماس می‌گیریم.",
-  msg_err:"مشکلی پیش آمد، لطفاً دوباره تلاش کنید."
+  msg_err:"مشکلی پیش آمد، لطفاً دوباره تلاش کنید.",
+  msg_dup:"این شماره قبلاً ثبت‌نام شده است.",
+  msg_already_title:"شما قبلاً ثبت‌نام کرده‌اید",
+  msg_already_body:"درخواست شما ثبت شده و به‌زودی برای هماهنگی کلاس با شما تماس می‌گیریم. نیازی به ارسال دوباره فرم نیست."
 },
 ckb: {
   brand:"خولی کۆمپیوتەر و بەرنامەنووسین",
@@ -1087,7 +1111,10 @@ ckb: {
   footer_text:"خولی چەمکە بنەڕەتییەکانی کۆمپیوتەر و بەرنامەنووسین — پۆلی ڕووبەڕوو",
   footer_partner:"بە هاوکاریی کتێب شار، لە کەمەربەندی شاری بانە",
   msg_ok:"تۆمارکردنەکەت بە سەرکەوتوویی نێردرا. بەم زووانە پەیوەندیت پێوە دەکەین.",
-  msg_err:"کێشەیەک ڕوویدا، تکایە دووبارە هەوڵ بدەرەوە."
+  msg_err:"کێشەیەک ڕوویدا، تکایە دووبارە هەوڵ بدەرەوە.",
+  msg_dup:"ئەم ژمارەیە پێشتر تۆمار کراوە.",
+  msg_already_title:"تۆ پێشتر تۆمار کراویت",
+  msg_already_body:"داواکارییەکەت تۆمار کراوە و بەم زووانە بۆ ڕێکخستنی پۆل پەیوەندیت پێوە دەکەین. پێویست ناکات دووبارە فۆرم بنێریتەوە."
 }
 };
 
@@ -1363,10 +1390,49 @@ async function refreshSeatCount(){
 })();
 
 /* ============ FORM SUBMIT (Supabase REST) ============ */
+const REG_DONE_KEY = 'agrin-reg-done';
 const regForm = document.getElementById('regForm');
 const formMsg = document.getElementById('formMsg');
+const formPanel = document.getElementById('formPanel');
+
+function normalizePhone(raw){
+  const digits = {
+    '۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9',
+    '٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'
+  };
+  let s = String(raw || '').replace(/[۰-۹٠-٩]/g, ch => digits[ch] || ch).replace(/\D/g, '');
+  if(s.startsWith('98') && s.length === 12) s = '0' + s.slice(2);
+  if(s.startsWith('9') && s.length === 10) s = '0' + s;
+  return s;
+}
+
+function isAlreadyRegistered(){
+  return localStorage.getItem(REG_DONE_KEY) === '1';
+}
+
+function markRegisteredLocal(){
+  localStorage.setItem(REG_DONE_KEY, '1');
+}
+
+function applyRegisteredState(){
+  if(!formPanel) return;
+  formPanel.classList.toggle('is-registered', isAlreadyRegistered());
+}
+
+function isUniqueViolation(err){
+  const msg = String(err && err.message || err || '');
+  return /23505|duplicate key|unique constraint|already exists/i.test(msg);
+}
+
+applyRegisteredState();
+
 regForm.addEventListener('submit', async function(e){
   e.preventDefault();
+  if(isAlreadyRegistered()){
+    applyRegisteredState();
+    return;
+  }
+
   formMsg.textContent = '';
   formMsg.className = '';
 
@@ -1380,11 +1446,11 @@ regForm.addEventListener('submit', async function(e){
   }
 
   const name = (data.get('fullname') || '').toString().trim();
-  const phone = (data.get('phone') || '').toString().trim();
+  const phone = normalizePhone(data.get('phone'));
   const ageRaw = data.get('age');
   const age = ageRaw === '' || ageRaw == null ? null : Number(ageRaw);
 
-  if(!name || !phone || !Number.isFinite(age) || age < 15 || age > 25){
+  if(!name || phone.length < 10 || !Number.isFinite(age) || age < 15 || age > 25){
     formMsg.textContent = DICT[currentLang].msg_err;
     formMsg.className = 'err';
     return;
@@ -1416,14 +1482,18 @@ regForm.addEventListener('submit', async function(e){
 
   try{
     await sbInsert('registrations', payload);
-    formMsg.textContent = DICT[currentLang].msg_ok;
-    formMsg.className = 'ok';
-    regForm.reset();
+    markRegisteredLocal();
+    applyRegisteredState();
     await refreshSeatCount();
   }catch(err){
     console.error(err);
-    formMsg.textContent = DICT[currentLang].msg_err;
-    formMsg.className = 'err';
+    if(isUniqueViolation(err)){
+      formMsg.textContent = DICT[currentLang].msg_dup;
+      formMsg.className = 'err';
+    }else{
+      formMsg.textContent = DICT[currentLang].msg_err;
+      formMsg.className = 'err';
+    }
   }finally{
     if(btn) btn.disabled = false;
   }
