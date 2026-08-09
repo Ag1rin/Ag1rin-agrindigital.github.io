@@ -109,10 +109,10 @@ h1,h2,h3{font-family:var(--font-display);font-weight:800;margin:0;letter-spacing
 h2{font-size:clamp(26px,4vw,38px);}
 h3{font-size:19px;font-weight:700;}
 p{color:var(--text-dim);margin:0;}
-.section{padding:96px 0;border-top:1px solid var(--border);}
-.section-head{max-width:640px;margin-bottom:52px;}
+.section{padding:120px 0;border-top:1px solid var(--border);}
+.section-head{max-width:640px;margin-bottom:56px;}
 .section-head p{margin-top:14px;font-size:16.5px;}
-#form.section{padding-bottom:72px;}
+#form.section{padding-bottom:96px;}
 
 button,a,.check-item,.icon-btn,.nav-cta,.btn-primary,.btn-ghost{
   -webkit-tap-highlight-color:transparent;
@@ -161,7 +161,7 @@ button,a,.check-item,.icon-btn,.nav-cta,.btn-primary,.btn-ghost{
 .nav-cta:hover{transform:translateY(-1px);filter:brightness(1.05);}
 
 /* ============ HERO ============ */
-.hero{padding:74px 0 40px;position:relative;overflow:hidden;}
+.hero{padding:96px 0 64px;position:relative;overflow:hidden;}
 .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;}
 .hero h1{font-size:clamp(32px,5.2vw,54px);line-height:1.22;}
 .hero h1 .accent{color:var(--accent);}
@@ -199,8 +199,8 @@ button,a,.check-item,.icon-btn,.nav-cta,.btn-primary,.btn-ghost{
 @keyframes goPulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.15);opacity:.7;}}
 
 /* ============ MARQUEE / STRIP ============ */
-.strip{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--surface);}
-.strip-inner{max-width:var(--maxw);margin:0 auto;padding:22px 24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:18px;}
+.strip{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--surface);margin:8px 0 0;}
+.strip-inner{max-width:var(--maxw);margin:0 auto;padding:28px 24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:22px;}
 .strip-item{display:flex;flex-direction:column;gap:4px;font-family:var(--font-mono);}
 .strip-item b{font-size:13.5px;color:var(--text);}
 .strip-item span{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em;}
@@ -439,25 +439,57 @@ html[dir="rtl"] .field select{
 
 /* ============ FOOTER ============ */
 footer{
-  margin-top:28px;
-  padding:56px 0 48px;
-  border-top:1px solid var(--border);
-  background:color-mix(in srgb, var(--surface) 72%, transparent);
+  margin-top:48px;
+  padding:0 0 max(40px, env(safe-area-inset-bottom));
+  border-top:none;
+  background:transparent;
+}
+.footer-panel{
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(700px 220px at 100% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 60%),
+    radial-gradient(520px 200px at 0% 100%, color-mix(in srgb, var(--accent-2) 12%, transparent), transparent 55%),
+    var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-l);
+  padding:34px 36px;
+  box-shadow:var(--shadow);
+}
+.footer-panel::before{
+  content:"";position:absolute;inset-inline:0;top:0;height:3px;
+  background:linear-gradient(90deg, var(--accent), var(--accent-2));
 }
 .footer-inner{
-  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px 28px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:22px 28px;
+  position:relative;z-index:1;
 }
-.footer-brand{display:flex;align-items:center;gap:14px;min-width:0;}
+.footer-brand{display:flex;align-items:center;gap:16px;min-width:0;}
 .footer-brand img{
-  width:42px;height:42px;border-radius:50%;flex:none;
-  border:1.5px solid var(--border);background:var(--surface-2);
+  width:48px;height:48px;border-radius:50%;flex:none;
+  border:1.5px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  background:var(--surface-2);
+  box-shadow:0 10px 24px -16px color-mix(in srgb, var(--accent) 55%, transparent);
 }
 .footer-copy{min-width:0;}
-.footer-copy .footer-title{color:var(--text);font-size:13.5px;font-weight:600;line-height:1.55;}
-.footer-copy .footer-meta{margin-top:5px;font-size:12.5px;color:var(--text-dim);line-height:1.55;}
+.footer-kicker{
+  font-family:var(--font-mono);font-size:11px;color:var(--accent-2);
+  margin-bottom:6px;letter-spacing:.04em;
+}
+.footer-copy .footer-title{color:var(--text);font-size:14.5px;font-weight:700;line-height:1.55;}
+.footer-copy .footer-meta{margin-top:6px;font-size:13px;color:var(--text-dim);line-height:1.55;}
+.footer-side{display:flex;flex-direction:column;align-items:flex-end;gap:12px;}
+.footer-cta{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:13px;font-weight:700;color:var(--ink-900);
+  background:var(--accent-2);padding:10px 16px;border-radius:12px;
+  box-shadow:0 10px 22px -14px color-mix(in srgb, var(--accent-2) 70%, transparent);
+  transition:transform .25s ease, filter .25s ease;
+}
+.footer-cta:hover{transform:translateY(-1px);filter:brightness(1.05);}
 .footer-ver{
-  font-family:var(--font-mono);font-size:12px;color:var(--text-dim);
-  padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:var(--surface);
+  font-family:var(--font-mono);font-size:11.5px;color:var(--text-dim);
+  padding:5px 10px;border-radius:999px;border:1px solid var(--border);background:var(--surface-2);
 }
 
 /* reveal on scroll — only hide after JS marks page ready (avoids blank stuck page) */
@@ -476,8 +508,10 @@ footer{
   .check-grid{grid-template-columns:repeat(2,1fr);}
   .form-panel{padding:28px;}
   .strip-inner{gap:20px;}
-  .section{padding:80px 0;}
-  .section-head{margin-bottom:36px;}
+  .section{padding:96px 0;}
+  .section-head{margin-bottom:42px;}
+  #form.section{padding-bottom:80px;}
+  .hero{padding:72px 0 48px;}
 }
 @media (max-width:640px){
   .container{
@@ -485,10 +519,10 @@ footer{
     padding-left:max(18px, env(safe-area-inset-left));
     padding-right:max(18px, env(safe-area-inset-right));
   }
-  .section{padding:56px 0;}
-  #form.section{padding-bottom:64px;}
-  .section-head{margin-bottom:28px;}
-  .section-head p{font-size:15px;margin-top:10px;line-height:1.7;}
+  .section{padding:72px 0;}
+  #form.section{padding-bottom:80px;}
+  .section-head{margin-bottom:34px;}
+  .section-head p{font-size:15px;margin-top:12px;line-height:1.7;}
   h2{font-size:clamp(24px,6.4vw,32px);line-height:1.3;}
   #syllabus,#pricing,#form{scroll-margin-top:92px;}
 
@@ -512,11 +546,11 @@ footer{
   .icon-btn{width:36px;height:36px;border-radius:10px;}
   .nav-cta{padding:8px 12px;font-size:12.5px;border-radius:10px;min-height:36px;display:inline-flex;align-items:center;}
 
-  .hero{padding:28px 0 20px;}
+  .hero{padding:48px 0 36px;}
   .hero h1{font-size:clamp(28px,7.2vw,38px);line-height:1.28;}
-  .hero-sub{font-size:15px;margin-top:14px;max-width:100%;line-height:1.75;}
+  .hero-sub{font-size:15px;margin-top:16px;max-width:100%;line-height:1.75;}
   .hero-stats{
-    display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px;
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:26px;
   }
   .hero-stat{
     min-width:0;
@@ -527,17 +561,17 @@ footer{
   }
   .hero-stat b{font-size:20px;line-height:1.2;}
   .hero-stat span{font-size:12px;margin-top:4px;display:block;}
-  .hero-actions{flex-direction:column;align-items:stretch;margin-top:22px;gap:10px;}
+  .hero-actions{flex-direction:column;align-items:stretch;margin-top:26px;gap:10px;}
   .hero-actions .btn-primary,.hero-actions .btn-ghost{
     width:100%;text-align:center;min-height:48px;display:inline-flex;align-items:center;justify-content:center;
   }
-  .flow-wrap{padding:16px;border-radius:20px;}
+  .flow-wrap{padding:16px;border-radius:20px;margin-top:8px;}
   .flow-svg{max-height:320px;margin-inline:auto;}
 
   /* horizontal strip like a clean ticker */
-  .strip{overflow:hidden;}
+  .strip{overflow:hidden;margin-top:12px;}
   .strip-inner{
-    padding:16px 0;
+    padding:20px 0;
     display:flex;flex-wrap:nowrap;gap:0;
     overflow-x:auto;-webkit-overflow-scrolling:touch;
     scroll-snap-type:x mandatory;
@@ -558,10 +592,10 @@ footer{
   .aud-card{padding:18px 16px;border-radius:16px;gap:12px;}
   .aud-card p{font-size:14.5px;line-height:1.65;}
 
-  .parts-nav{gap:8px;margin-bottom:28px;}
+  .parts-nav{gap:8px;margin-bottom:32px;}
   .part-chip{padding:8px 12px;font-size:12px;}
 
-  .session{padding-inline-start:52px;padding-bottom:24px;}
+  .session{padding-inline-start:52px;padding-bottom:28px;}
   .syllabus-track::before{inset-inline-start:19px;}
   .session-node{width:40px;height:40px;border-radius:12px;font-size:13px;}
   .session-card{padding:16px 16px 18px;border-radius:16px;}
@@ -622,12 +656,16 @@ footer{
   .reg-done h3{font-size:19px;}
   .reg-done p{font-size:14px;}
 
-  .footer-inner{flex-direction:column;align-items:flex-start;gap:16px;}
-  footer{margin-top:20px;padding:40px 0 max(36px, env(safe-area-inset-bottom));}
+  .footer-inner{flex-direction:column;align-items:stretch;gap:18px;}
+  footer{margin-top:28px;padding:0 0 max(28px, env(safe-area-inset-bottom));}
+  .footer-panel{padding:24px 18px;border-radius:20px;}
   .footer-brand{align-items:flex-start;}
-  .footer-brand img{width:38px;height:38px;margin-top:2px;}
-  .footer-copy .footer-title{font-size:13px;}
-  .footer-copy .footer-meta{font-size:12px;}
+  .footer-brand img{width:42px;height:42px;margin-top:2px;}
+  .footer-copy .footer-title{font-size:13.5px;}
+  .footer-copy .footer-meta{font-size:12.5px;}
+  .footer-side{align-items:stretch;width:100%;}
+  .footer-cta{justify-content:center;width:100%;min-height:46px;}
+  .footer-ver{align-self:flex-start;}
 
   /* sticky register CTA — mobile only */
   .mobile-cta{
@@ -967,15 +1005,21 @@ footer{
 
 <!-- ============ FOOTER ============ -->
 <footer class="container">
-  <div class="footer-inner">
-    <div class="footer-brand">
-      <img src="assets/logo.png" alt="کتاب‌شهر">
-      <div class="footer-copy">
-        <p class="footer-title" data-i18n="footer_text"></p>
-        <p class="footer-meta" data-i18n="footer_partner"></p>
+  <div class="footer-panel">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="assets/logo.png" alt="کتاب‌شهر">
+        <div class="footer-copy">
+          <p class="footer-kicker" data-i18n="footer_kicker"></p>
+          <p class="footer-title" data-i18n="footer_text"></p>
+          <p class="footer-meta" data-i18n="footer_partner"></p>
+        </div>
+      </div>
+      <div class="footer-side">
+        <a href="#form" class="footer-cta" data-i18n="nav_cta"></a>
+        <span class="footer-ver">v1.3</span>
       </div>
     </div>
-    <span class="footer-ver">v1.3</span>
   </div>
 </footer>
 
@@ -1112,6 +1156,7 @@ fa: {
   times:["صبح (۹ تا ۱۲)","ظهر (۱۲ تا ۱۵)","عصر (۱۵ تا ۱۸)","شب (۱۸ تا ۲۱)"],
   footer_text:"دوره مفاهیم پایه کامپیوتر و برنامه‌نویسی — کلاس حضوری",
   footer_partner:"به همکاری کتاب‌شهر، واقع در کمربندی شهر بانه",
+  footer_kicker:"کتاب‌شهر · بانه",
   msg_ok:"ثبت‌نام شما با موفقیت ارسال شد. به‌زودی تماس می‌گیریم.",
   msg_err:"مشکلی پیش آمد، لطفاً دوباره تلاش کنید.",
   msg_dup:"این شماره قبلاً ثبت‌نام شده است.",
@@ -1241,6 +1286,7 @@ ckb: {
   times:["بەیانی (9 تا 12)","نیوەڕۆ (12 تا 15)","ئێوارە (15 تا 18)","شەو (18 تا 21)"],
   footer_text:"خولی چەمکە بنەڕەتییەکانی کۆمپیوتەر و بەرنامەنووسین — پۆلی ڕووبەڕوو",
   footer_partner:"بە هاوکاریی کتێب شار، لە کەمەربەندی شاری بانە",
+  footer_kicker:"کتێب شار · بانە",
   msg_ok:"تۆمارکردنەکەت بە سەرکەوتوویی نێردرا. بەم زووانە پەیوەندیت پێوە دەکەین.",
   msg_err:"کێشەیەک ڕوویدا، تکایە دووبارە هەوڵ بدەرەوە.",
   msg_dup:"ئەم ژمارەیە پێشتر تۆمار کراوە.",
@@ -1424,6 +1470,32 @@ function toggleTheme(){
 }
 
 /* ============ SUPABASE (raw REST — no CDN SDK, no blocking) ============ */
+function decodeCfgValue(value){
+  const s = String(value ?? '');
+  if(!s.startsWith('h:')) return s;
+  const hex = s.slice(2);
+  if(!hex || hex.length % 2 || !/^[0-9a-f]+$/i.test(hex)) return s;
+  try{
+    const bytes = new Uint8Array(hex.match(/.{2}/g).map(b => parseInt(b, 16)));
+    return new TextDecoder().decode(bytes);
+  }catch{
+    return s;
+  }
+}
+
+function resolveSiteConfig(raw){
+  const c = raw || {};
+  return {
+    supabaseUrl: decodeCfgValue(c.supabaseUrl),
+    supabaseAnonKey: decodeCfgValue(c.supabaseAnonKey),
+    adminUsername: decodeCfgValue(c.adminUsername || 'agrin'),
+    adminPasswordHash: c.adminPasswordHash || '',
+    adminPassword: c.adminPassword || ''
+  };
+}
+
+window.SITE_CONFIG = resolveSiteConfig(window.SITE_CONFIG);
+
 function isSupabaseConfigured(){
   const cfg = window.SITE_CONFIG || {};
   return !!(cfg.supabaseUrl && cfg.supabaseAnonKey

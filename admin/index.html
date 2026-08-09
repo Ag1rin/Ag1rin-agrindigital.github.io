@@ -198,7 +198,32 @@ create policy "anon_select_registrations"
 
 document.getElementById('policySql').textContent = POLICY_SQL;
 
-const cfg = window.SITE_CONFIG || {};
+function decodeCfgValue(value){
+  const s = String(value ?? '');
+  if(!s.startsWith('h:')) return s;
+  const hex = s.slice(2);
+  if(!hex || hex.length % 2 || !/^[0-9a-f]+$/i.test(hex)) return s;
+  try{
+    const bytes = new Uint8Array(hex.match(/.{2}/g).map(b => parseInt(b, 16)));
+    return new TextDecoder().decode(bytes);
+  }catch{
+    return s;
+  }
+}
+
+function resolveSiteConfig(raw){
+  const c = raw || {};
+  return {
+    supabaseUrl: decodeCfgValue(c.supabaseUrl),
+    supabaseAnonKey: decodeCfgValue(c.supabaseAnonKey),
+    adminUsername: decodeCfgValue(c.adminUsername || 'agrin'),
+    adminPasswordHash: c.adminPasswordHash || '',
+    adminPassword: c.adminPassword || ''
+  };
+}
+
+const cfg = resolveSiteConfig(window.SITE_CONFIG);
+window.SITE_CONFIG = cfg;
 const loginView = document.getElementById('loginView');
 const dashView = document.getElementById('dashView');
 const loginMsg = document.getElementById('loginMsg');

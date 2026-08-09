@@ -60,15 +60,18 @@ jobs:
 
           HASH="$hash" node -e '
             const fs = require("fs");
+            // Store runtime secrets as hex ("h:...") so config.js is not plain text.
+            // adminPasswordHash stays a real SHA-256 digest for login verification.
+            const toHex = (value) => "h:" + Buffer.from(String(value), "utf8").toString("hex");
             const cfg = {
-              supabaseUrl: process.env.SUPABASE_URL.replace(/\/+$/, ""),
-              supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
-              adminUsername: process.env.ADMIN_USERNAME || "agrin",
+              supabaseUrl: toHex(process.env.SUPABASE_URL.replace(/\/+$/, "")),
+              supabaseAnonKey: toHex(process.env.SUPABASE_ANON_KEY),
+              adminUsername: toHex(process.env.ADMIN_USERNAME || "agrin"),
               adminPasswordHash: process.env.HASH
             };
             fs.writeFileSync("config.js", "window.SITE_CONFIG = " + JSON.stringify(cfg, null, 2) + ";\n");
           '
-          echo "config.js written ($(wc -c < config.js) bytes)"
+          echo "config.js written ($(wc -c < config.js) bytes, values hex-encoded)"
 
       - uses: actions/configure-pages@v5
 
