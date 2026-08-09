@@ -97,6 +97,14 @@ tr:last-child td{border-bottom:none;}
   .top-actions .btn{flex:1;}
   .stat{min-width:calc(50% - 8px);}
 }
+.section-block{margin-top:28px;}
+.section-block h2{margin:0 0 12px;font-size:18px;}
+.tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.tab-btn{
+  background:var(--surface);border:1px solid var(--border);color:var(--text);
+  border-radius:999px;padding:8px 14px;font-family:var(--font);font-size:13px;cursor:pointer;
+}
+.tab-btn.active{background:var(--accent);color:var(--ink-900);border-color:var(--accent);font-weight:700;}
 </style>
 </head>
 <body>
@@ -151,30 +159,58 @@ tr:last-child td{border-bottom:none;}
   <div class="stats">
     <div class="stat"><b id="statTotal">0</b><span>کل ثبت‌نام‌ها</span></div>
     <div class="stat"><b id="statToday">0</b><span>امروز</span></div>
+    <div class="stat"><b id="statWait">0</b><span>لیست انتظار</span></div>
+    <div class="stat"><b>20</b><span>ظرفیت دوره</span></div>
   </div>
 
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>نام</th>
-          <th>سن</th>
-          <th>تلفن</th>
-          <th>ایمیل</th>
-          <th>شهر</th>
-          <th>تجربه</th>
-          <th>روزها</th>
-          <th>ساعت‌ها</th>
-          <th>زبان</th>
-          <th>توضیحات</th>
-          <th>تاریخ</th>
-        </tr>
-      </thead>
-      <tbody id="tbody">
-        <tr><td colspan="12" class="empty">در حال بارگذاری…</td></tr>
-      </tbody>
-    </table>
+  <div class="tabs">
+    <button class="tab-btn active" type="button" id="tabReg">ثبت‌نام‌ها</button>
+    <button class="tab-btn" type="button" id="tabWait">لیست انتظار</button>
+  </div>
+
+  <div id="regSection">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>نام</th>
+            <th>سن</th>
+            <th>تلفن</th>
+            <th>ایمیل</th>
+            <th>شهر</th>
+            <th>تجربه</th>
+            <th>روزها</th>
+            <th>ساعت‌ها</th>
+            <th>زبان</th>
+            <th>توضیحات</th>
+            <th>تاریخ</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="12" class="empty">در حال بارگذاری…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="waitSection" class="hidden">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>نام</th>
+            <th>تلفن</th>
+            <th>زبان</th>
+            <th>تاریخ</th>
+          </tr>
+        </thead>
+        <tbody id="waitBody">
+          <tr><td colspan="5" class="empty">در حال بارگذاری…</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
   <div class="msg" id="dashMsg"></div>
 </section>
@@ -186,15 +222,30 @@ const POLICY_SQL = `-- run once in Supabase SQL Editor
 grant usage on schema public to anon, authenticated;
 grant insert on table public.registrations to anon;
 grant select on table public.registrations to anon, authenticated;
-
 drop policy if exists "anon_insert_registrations" on public.registrations;
 create policy "anon_insert_registrations"
   on public.registrations for insert to anon with check (true);
-
-drop policy if exists "authenticated_select_registrations" on public.registrations;
 drop policy if exists "anon_select_registrations" on public.registrations;
 create policy "anon_select_registrations"
-  on public.registrations for select to anon, authenticated using (true);`;
+  on public.registrations for select to anon, authenticated using (true);
+
+create table if not exists public.waitlist (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  name text not null,
+  phone text not null,
+  lang text
+);
+create unique index if not exists waitlist_phone_unique on public.waitlist (phone);
+alter table public.waitlist enable row level security;
+grant insert on table public.waitlist to anon;
+grant select on table public.waitlist to anon, authenticated;
+drop policy if exists "anon_insert_waitlist" on public.waitlist;
+create policy "anon_insert_waitlist"
+  on public.waitlist for insert to anon with check (true);
+drop policy if exists "anon_select_waitlist" on public.waitlist;
+create policy "anon_select_waitlist"
+  on public.waitlist for select to anon, authenticated using (true);`;
 
 document.getElementById('policySql').textContent = POLICY_SQL;
 
@@ -232,10 +283,19 @@ const tbody = document.getElementById('tbody');
 const policyWarn = document.getElementById('policyWarn');
 
 let rowsCache = [];
+let waitCache = [];
 
 function showDash(show){
   loginView.classList.toggle('hidden', show);
   dashView.classList.toggle('hidden', !show);
+}
+
+function setTab(which){
+  const reg = which === 'reg';
+  document.getElementById('tabReg').classList.toggle('active', reg);
+  document.getElementById('tabWait').classList.toggle('active', !reg);
+  document.getElementById('regSection').classList.toggle('hidden', !reg);
+  document.getElementById('waitSection').classList.toggle('hidden', reg);
 }
 
 function fmtDate(iso){
@@ -306,6 +366,37 @@ function renderRows(rows){
   `).join('');
 }
 
+function renderWaitlist(rows){
+  waitCache = rows || [];
+  document.getElementById('statWait').textContent = String(waitCache.length);
+  const waitBody = document.getElementById('waitBody');
+  if(!waitCache.length){
+    waitBody.innerHTML = `<tr><td colspan="5" class="empty">هنوز کسی در لیست انتظار نیست.</td></tr>`;
+    return;
+  }
+  waitBody.innerHTML = waitCache.map((r,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td><b>${escapeHtml(r.name || '')}</b></td>
+      <td dir="ltr">${escapeHtml(r.phone || '')}</td>
+      <td><span class="badge">${escapeHtml(r.lang || '—')}</span></td>
+      <td>${fmtDate(r.created_at)}</td>
+    </tr>
+  `).join('');
+}
+
+async function fetchTable(table){
+  const url = cfg.supabaseUrl.replace(/\/$/, '') + `/rest/v1/${table}?select=*&order=created_at.desc`;
+  const res = await fetch(url, {
+    headers: {
+      apikey: cfg.supabaseAnonKey,
+      Authorization: 'Bearer ' + cfg.supabaseAnonKey
+    }
+  });
+  if(!res.ok) throw new Error(await res.text());
+  return await res.json();
+}
+
 async function loadRows(){
   dashMsg.textContent = '';
   dashMsg.className = 'msg';
@@ -317,21 +408,18 @@ async function loadRows(){
   }
 
   try{
-    const url = cfg.supabaseUrl.replace(/\/$/, '') + '/rest/v1/registrations?select=*&order=created_at.desc';
-    const res = await fetch(url, {
-      headers: {
-        apikey: cfg.supabaseAnonKey,
-        Authorization: 'Bearer ' + cfg.supabaseAnonKey
-      }
-    });
-    if(!res.ok) throw new Error(await res.text());
-    const data = await res.json();
+    const [regs, waits] = await Promise.all([
+      fetchTable('registrations'),
+      fetchTable('waitlist').catch(()=>[])
+    ]);
     policyWarn.classList.remove('show');
-    renderRows(data || []);
+    renderRows(regs || []);
+    renderWaitlist(waits || []);
   }catch(err){
     console.error(err);
     policyWarn.classList.add('show');
     tbody.innerHTML = `<tr><td colspan="12" class="empty">خواندن داده ممکن نشد. SQL سیاست‌ها را اجرا کنید.</td></tr>`;
+    document.getElementById('waitBody').innerHTML = `<tr><td colspan="5" class="empty">خواندن لیست انتظار ممکن نشد.</td></tr>`;
     dashMsg.textContent = 'خطا در خواندن داده';
     dashMsg.className = 'msg err';
   }
@@ -380,20 +468,27 @@ document.getElementById('loginForm').addEventListener('submit', async (e)=>{
 document.getElementById('logoutBtn').addEventListener('click', ()=>{
   sessionStorage.removeItem(SESSION_KEY);
   rowsCache = [];
+  waitCache = [];
   showDash(false);
 });
 
 document.getElementById('refreshBtn').addEventListener('click', loadRows);
+document.getElementById('tabReg').addEventListener('click', ()=>setTab('reg'));
+document.getElementById('tabWait').addEventListener('click', ()=>setTab('wait'));
 
 document.getElementById('csvBtn').addEventListener('click', ()=>{
-  if(!rowsCache.length){
+  const waitActive = !document.getElementById('waitSection').classList.contains('hidden');
+  const rows = waitActive ? waitCache : rowsCache;
+  if(!rows.length){
     dashMsg.textContent = 'داده‌ای برای خروجی نیست.';
     dashMsg.className = 'msg err';
     return;
   }
-  const headers = ['name','age','phone','email','city','experience','days','times','lang','notes','created_at'];
+  const headers = waitActive
+    ? ['name','phone','lang','created_at']
+    : ['name','age','phone','email','city','experience','days','times','lang','notes','created_at'];
   const lines = [headers.join(',')];
-  rowsCache.forEach(r=>{
+  rows.forEach(r=>{
     const vals = headers.map(h=>{
       let v = r[h];
       if(Array.isArray(v)) v = v.join('|');
@@ -406,7 +501,7 @@ document.getElementById('csvBtn').addEventListener('click', ()=>{
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'registrations.csv';
+  a.download = waitActive ? 'waitlist.csv' : 'registrations.csv';
   a.click();
   URL.revokeObjectURL(url);
 });

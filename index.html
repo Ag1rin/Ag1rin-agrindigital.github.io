@@ -351,6 +351,13 @@ button,a,.check-item,.icon-btn,.nav-cta,.btn-primary,.btn-ghost{
 .pay-note svg{flex:none;width:22px;height:22px;color:var(--accent-2);margin-top:2px;}
 .pay-note p{color:var(--text);font-size:14.5px;}
 .pay-note b{color:var(--accent-2);}
+.capacity-note{
+  margin:18px 0 0;text-align:center;font-family:var(--font-mono);font-size:13.5px;font-weight:700;
+  color:var(--accent-2);padding:10px 14px;border-radius:999px;border:1px solid var(--border);
+  background:color-mix(in srgb, var(--accent-2) 10%, transparent);display:inline-block;
+  width:auto;
+}
+#pricing .capacity-note{display:table;margin-inline:auto;}
 
 /* ============ FORM ============ */
 .form-panel{
@@ -426,16 +433,30 @@ html[dir="rtl"] .field select{
   display:none;text-align:center;padding:28px 12px 8px;
 }
 .form-panel.is-registered .reg-done{display:block;}
-.form-panel.is-registered #regForm{display:none;}
-.reg-done-icon{
+.form-panel.is-registered #regForm,
+.form-panel.is-registered #waitlistBlock{display:none;}
+.form-panel.is-full:not(.is-registered) #regForm{display:none;}
+.form-panel.is-full:not(.is-registered) #waitlistBlock{display:block;}
+#waitlistBlock{display:none;}
+.waitlist-head{margin:4px 0 18px;}
+.waitlist-head h3{font-size:20px;margin:0 0 8px;}
+.waitlist-head p{font-size:14.5px;line-height:1.7;}
+.wait-done{display:none;text-align:center;padding:18px 8px 4px;}
+.form-panel.is-waitlisted #waitForm{display:none;}
+.form-panel.is-waitlisted .waitlist-head{display:none;}
+.form-panel.is-waitlisted .wait-done{display:block;}
+.reg-done-icon,.wait-done-icon{
   width:56px;height:56px;margin:0 auto 16px;border-radius:50%;
   display:grid;place-items:center;
   background:color-mix(in srgb, var(--accent-2) 18%, transparent);
   color:var(--accent-2);
 }
-.reg-done-icon svg{width:28px;height:28px;}
-.reg-done h3{font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--text);margin:0 0 8px;}
-.reg-done p{color:var(--text-dim);font-size:14.5px;max-width:420px;margin:0 auto;line-height:1.7;}
+.reg-done-icon svg,.wait-done-icon svg{width:28px;height:28px;}
+.reg-done h3,.wait-done h3{font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--text);margin:0 0 8px;}
+.reg-done p,.wait-done p{color:var(--text-dim);font-size:14.5px;max-width:420px;margin:0 auto;line-height:1.7;}
+#waitMsg{font-size:14px;font-weight:600;}
+#waitMsg.ok{color:var(--accent-2);}
+#waitMsg.err{color:var(--red-soft);}
 
 /* ============ FOOTER ============ */
 footer{
@@ -915,6 +936,7 @@ footer{
       <p class="price-desc" data-i18n="price2_desc"></p>
     </div>
   </div>
+  <p class="capacity-note" data-i18n="capacity_label"></p>
   <div class="pay-note">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
     <p data-i18n="pay_note"></p>
@@ -938,6 +960,38 @@ footer{
       <h3 data-i18n="msg_already_title"></h3>
       <p data-i18n="msg_already_body"></p>
     </div>
+
+    <div id="waitlistBlock">
+      <div class="waitlist-head">
+        <h3 data-i18n="wait_title"></h3>
+        <p data-i18n="wait_sub"></p>
+      </div>
+      <div class="wait-done" id="waitDone" aria-live="polite">
+        <div class="wait-done-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <h3 data-i18n="wait_ok_title"></h3>
+        <p data-i18n="wait_ok_body"></p>
+      </div>
+      <form id="waitForm" name="course-waitlist">
+        <input class="hp-field" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <div class="field-row">
+          <div class="field">
+            <label data-i18n="f_name"></label>
+            <input type="text" name="fullname" required autocomplete="name" enterkeyhint="next">
+          </div>
+          <div class="field">
+            <label data-i18n="f_phone"></label>
+            <input type="tel" name="phone" required autocomplete="tel" inputmode="tel" enterkeyhint="done" placeholder="09xxxxxxxxx">
+          </div>
+        </div>
+        <div class="submit-row">
+          <button type="submit" class="btn-primary" data-i18n="wait_submit"></button>
+          <span id="waitMsg"></span>
+        </div>
+      </form>
+    </div>
+
     <form id="regForm" name="course-registration">
       <input class="hp-field" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
 
@@ -1122,24 +1176,32 @@ fa: {
   price_title:"هزینه ثبت‌نام",
   price_sub:"ظرفیت هر دوره محدود است؛ هرچه زودتر ثبت‌نام کنید، هزینه کمتری پرداخت می‌کنید.",
   price1_badge:"۱۰ نفر اول",
-  price1_amount:"۱,۳۰۰,۰۰۰",
+  price1_amount:"۱,۷۰۰,۰۰۰",
   price1_desc:"برای ۱۰ نفری که زودتر ثبت‌نام کنند.",
   price2_badge:"۱۰ نفر بعدی",
-  price2_amount:"۲,۰۰۰,۰۰۰",
+  price2_amount:"۲,۵۰۰,۰۰۰",
   price2_desc:"برای ۱۰ نفری که بعد از تکمیل ظرفیت ۱۰ نفر اول ثبت‌نام کنند.",
   price_unit:"تومان",
   price1_full_badge:"ظرفیت تکمیل شد",
   price2_full_badge:"ظرفیت تکمیل شد",
+  capacity_label:"ظرفیت دوره: 20 نفر",
   pay_note:"فعلاً فقط کافی است فرم زیر را پر کنید تا جای خود را رزرو کنید؛ <b>مبلغ دوره بعداً و به‌صورت حضوری</b> در جلسه اول دریافت می‌شود.",
   reg_price_title:"هزینه دوره برای شما",
   seats_left_label:"صندلی خالی از ظرفیت 10 نفر اول",
   seats_left_label_t2:"صندلی خالی از ظرفیت 10 نفر بعدی",
-  reg_price_full_title:"ظرفیت این مرحله تکمیل شده",
-  reg_price_full_note:"ظرفیت هر دو مرحله تکمیل شده است؛ در صورت باز شدن ظرفیت جدید به شما اطلاع می‌دهیم.",
+  reg_price_full_title:"ظرفیت دوره تکمیل شد",
+  reg_price_full_note:"ظرفیت دوره 20 نفر است و فعلاً تکمیل شده. می‌توانید برای اطلاع از ظرفیت جدید ثبت‌نام کنید.",
 
   form_eyebrow:"ثبت‌نام",
   form_title:"صندلی خودتان را رزرو کنید",
   form_sub:"فرم زیر را پر کنید تا با شما برای هماهنگی روز و ساعت کلاس تماس بگیریم. پرداخت هزینه در حال حاضر لازم نیست.",
+  wait_eyebrow:"لیست انتظار",
+  wait_title:"اگر ظرفیت باز شد یا دوره جدید برگزار شد بهم اطلاع بده",
+  wait_sub:"نام و شماره تماس خود را بگذارید تا به‌محض باز شدن ظرفیت یا شروع دوره جدید با شما تماس بگیریم.",
+  wait_submit:"ثبت درخواست اطلاع‌رسانی",
+  wait_ok_title:"درخواست شما ثبت شد",
+  wait_ok_body:"به‌محض باز شدن ظرفیت یا برگزاری دوره جدید با شما تماس می‌گیریم.",
+  wait_dup:"این شماره قبلاً در لیست انتظار ثبت شده است.",
   f_name:"نام و نام خانوادگی",
   f_age:"سن",
   f_phone:"شماره تماس",
@@ -1163,7 +1225,8 @@ fa: {
   msg_err:"مشکلی پیش آمد، لطفاً دوباره تلاش کنید.",
   msg_dup:"این شماره قبلاً ثبت‌نام شده است.",
   msg_already_title:"شما قبلاً ثبت‌نام کرده‌اید",
-  msg_already_body:"درخواست شما ثبت شده و به‌زودی برای هماهنگی کلاس با شما تماس می‌گیریم. نیازی به ارسال دوباره فرم نیست."
+  msg_already_body:"درخواست شما ثبت شده و به‌زودی برای هماهنگی کلاس با شما تماس می‌گیریم. نیازی به ارسال دوباره فرم نیست.",
+  msg_full:"ظرفیت دوره تکمیل شده است."
 },
 ckb: {
   brand:"خولی کۆمپیوتەر و بەرنامەنووسین",
@@ -1254,24 +1317,32 @@ ckb: {
   price_title:"تێچووی تۆمارکردن",
   price_sub:"جێگاکانی خول سنووردارن؛ هەرچەندە زووتر تۆمار بکەیت، تێچووی کەمتر دەدەیت.",
   price1_badge:"10 کەسی یەکەم",
-  price1_amount:"١,٣٠٠,٠٠٠",
+  price1_amount:"١,٧٠٠,٠٠٠",
   price1_desc:"بۆ ئەو 10 کەسەی زووتر تۆمار دەکەن.",
   price2_badge:"10 کەسی دواتر",
-  price2_amount:"٢,٠٠٠,٠٠٠",
+  price2_amount:"٢,٥٠٠,٠٠٠",
   price2_desc:"بۆ ئەو 10 کەسەی دوای پڕبوونەوەی جێگای 10 کەسی یەکەم تۆمار دەکەن.",
   price_unit:"تومان",
   price1_full_badge:"جێگا پڕبوو",
   price2_full_badge:"جێگا پڕبوو",
+  capacity_label:"جێگای خول: 20 کەس",
   pay_note:"ئێستا تەنها پێویستە فۆرمی خوارەوە پڕبکەیتەوە تاکو جێگای خۆت دیاری بکەیت؛ <b>بەهای خولەکە دواتر و ڕووبەڕوو</b> لە دانیشتنی یەکەمدا وەردەگیرێت.",
   reg_price_title:"تێچووی خول بۆ تۆ",
   seats_left_label:"جێگای بەتاڵ لە 10 کەسی یەکەم",
   seats_left_label_t2:"جێگای بەتاڵ لە 10 کەسی دواتر",
-  reg_price_full_title:"جێگای ئەم قۆناغە پڕبوو",
-  reg_price_full_note:"جێگای هەردوو قۆناغ پڕبووە؛ ئەگەر جێگای نوێ کرایەوە ئاگادارت دەکەینەوە.",
+  reg_price_full_title:"جێگای خول پڕبوو",
+  reg_price_full_note:"جێگای خول 20 کەسە و ئێستا پڕبووە. دەتوانیت بۆ ئاگادارکردنەوە تۆمار بکەیت.",
 
   form_eyebrow:"تۆمارکردن",
   form_title:"جێگای خۆت دیاری بکە",
   form_sub:"فۆرمی خوارەوە پڕبکەرەوە تاکو پەیوەندیت پێوە بکەین بۆ ڕێکخستنی ڕۆژ و کاتی وانە. ئێستا پێویستی بە پارەدان نییە.",
+  wait_eyebrow:"لیستی چاوەڕوانی",
+  wait_title:"ئەگەر جێگا کرایەوە یان خولی نوێ بەڕێوەچوو ئاگادارم بکەرەوە",
+  wait_sub:"ناو و ژمارەی پەیوەندیت بنووسە تاکو کاتێک جێگا کرایەوە یان خولی نوێ دەستی پێکرد پەیوەندیت پێوە بکەین.",
+  wait_submit:"تۆمارکردنی داواکاری ئاگادارکردنەوە",
+  wait_ok_title:"داواکارییەکەت تۆمار کرا",
+  wait_ok_body:"کاتێک جێگا کرایەوە یان خولی نوێ بەڕێوەچوو پەیوەندیت پێوە دەکەین.",
+  wait_dup:"ئەم ژمارەیە پێشتر لە لیستی چاوەڕوانیدا تۆمار کراوە.",
   f_name:"ناوی تەواو",
   f_age:"تەمەن",
   f_phone:"ژمارەی پەیوەندی",
@@ -1295,7 +1366,8 @@ ckb: {
   msg_err:"کێشەیەک ڕوویدا، تکایە دووبارە هەوڵ بدەرەوە.",
   msg_dup:"ئەم ژمارەیە پێشتر تۆمار کراوە.",
   msg_already_title:"تۆ پێشتر تۆمار کراویت",
-  msg_already_body:"داواکارییەکەت تۆمار کراوە و بەم زووانە بۆ ڕێکخستنی پۆل پەیوەندیت پێوە دەکەین. پێویست ناکات دووبارە فۆرم بنێریتەوە."
+  msg_already_body:"داواکارییەکەت تۆمار کراوە و بەم زووانە بۆ ڕێکخستنی پۆل پەیوەندیت پێوە دەکەین. پێویست ناکات دووبارە فۆرم بنێریتەوە.",
+  msg_full:"جێگای خول پڕبووە."
 }
 };
 
@@ -1306,11 +1378,13 @@ let currentLang = 'fa';
    تعداد ثبت‌نام‌ها از Supabase خوانده می‌شود (تابع registration_count).
    اگر config تنظیم نشده باشد، از seatsFilledFallback استفاده می‌شود.
    ============================================================ */
-const SEATS_TIER1 = 10; // ۱۰ نفر اول — ۱,۳۰۰,۰۰۰
-const SEATS_TIER2 = 10; // ۱۰ نفر بعدی — ۲,۰۰۰,۰۰۰
-const SEATS_TOTAL = SEATS_TIER1 + SEATS_TIER2;
+const SEATS_TIER1 = 10; // ۱۰ نفر اول — ۱,۷۰۰,۰۰۰
+const SEATS_TIER2 = 10; // ۱۰ نفر بعدی — ۲,۵۰۰,۰۰۰
+const SEATS_TOTAL = SEATS_TIER1 + SEATS_TIER2; // ظرفیت کل دوره: 20 نفر
 let seatsFilled = 0;
 const seatsFilledFallback = 0; // فقط وقتی Supabase وصل نیست
+const REG_DONE_KEY = 'agrin-reg-done';
+const WAIT_DONE_KEY = 'agrin-wait-done';
 
 /* ============================================================
    RENDER
@@ -1416,10 +1490,56 @@ function bindCheckItems(){
 }
 
 /* ============ PRICING / SEATS RENDER ============ */
+function isCapacityFull(){
+  return seatsFilled >= SEATS_TOTAL;
+}
+
+function isAlreadyRegistered(){
+  return localStorage.getItem(REG_DONE_KEY) === '1';
+}
+
+function applyFormMode(){
+  const panel = document.getElementById('formPanel');
+  if(!panel) return;
+  const registered = isAlreadyRegistered();
+  const waitlisted = localStorage.getItem(WAIT_DONE_KEY) === '1';
+  const full = isCapacityFull();
+
+  panel.classList.toggle('is-registered', registered);
+  panel.classList.toggle('is-full', full);
+  panel.classList.toggle('is-waitlisted', waitlisted && full && !registered);
+  document.body.classList.toggle('is-registered', registered);
+  document.body.classList.toggle('is-full', full && !registered);
+
+  const d = DICT[currentLang];
+  const eyebrow = document.querySelector('#form .eyebrow');
+  const title = document.querySelector('#form h2');
+  const sub = document.querySelector('#form .section-head p');
+  if(registered){
+    if(eyebrow) eyebrow.innerHTML = d.form_eyebrow;
+    if(title) title.innerHTML = d.msg_already_title;
+    if(sub) sub.innerHTML = d.msg_already_body;
+  } else if(full){
+    if(eyebrow) eyebrow.innerHTML = d.wait_eyebrow;
+    if(title) title.innerHTML = d.wait_title;
+    if(sub) sub.innerHTML = d.wait_sub;
+  } else {
+    if(eyebrow) eyebrow.innerHTML = d.form_eyebrow;
+    if(title) title.innerHTML = d.form_title;
+    if(sub) sub.innerHTML = d.form_sub;
+  }
+
+  const mobileCta = document.getElementById('mobileCta');
+  if(mobileCta){
+    const label = mobileCta.querySelector('[data-i18n="nav_cta"]') || mobileCta.querySelector('a');
+    if(label) label.textContent = full && !registered ? (d.wait_submit || d.nav_cta) : d.nav_cta;
+  }
+}
+
 function renderPricing(lang){
   const d = DICT[lang];
   const tier1Full = seatsFilled >= SEATS_TIER1;
-  const allFull = seatsFilled >= SEATS_TOTAL;
+  const allFull = isCapacityFull();
   const tier1Left = Math.max(SEATS_TIER1 - seatsFilled, 0);
   const tier2Left = Math.max(SEATS_TOTAL - Math.max(seatsFilled, SEATS_TIER1), 0);
 
@@ -1440,7 +1560,7 @@ function renderPricing(lang){
   if(allFull){
     box.innerHTML = `
       <div>
-        <div class="rp-label">${d.reg_price_title}</div>
+        <div class="rp-label">${d.capacity_label}</div>
         <div class="rp-amount">${d.reg_price_full_title}</div>
       </div>
       <div class="rp-seats">${d.reg_price_full_note}</div>
@@ -1451,7 +1571,7 @@ function renderPricing(lang){
         <div class="rp-label">${d.reg_price_title}</div>
         <div class="rp-amount">${d.price2_amount}<span class="unit">${d.price_unit}</span></div>
       </div>
-      <div class="rp-seats">${tier2Left} ${d.seats_left_label_t2}</div>
+      <div class="rp-seats">${tier2Left} ${d.seats_left_label_t2} · ${d.capacity_label}</div>
     `;
   } else {
     box.innerHTML = `
@@ -1459,9 +1579,10 @@ function renderPricing(lang){
         <div class="rp-label">${d.reg_price_title}</div>
         <div class="rp-amount">${d.price1_amount}<span class="unit">${d.price_unit}</span></div>
       </div>
-      <div class="rp-seats">${tier1Left} ${d.seats_left_label}</div>
+      <div class="rp-seats">${tier1Left} ${d.seats_left_label} · ${d.capacity_label}</div>
     `;
   }
+  applyFormMode();
 }
 
 function setLang(lang){
@@ -1471,6 +1592,7 @@ function setLang(lang){
   document.getElementById('btnFa').classList.toggle('active', lang==='fa');
   document.getElementById('btnCkb').classList.toggle('active', lang==='ckb');
   renderContent(lang);
+  applyFormMode();
   localStorage.setItem('site-lang', lang);
 }
 
@@ -1624,9 +1746,10 @@ async function refreshSeatCount(){
 })();
 
 /* ============ FORM SUBMIT (Supabase REST) ============ */
-const REG_DONE_KEY = 'agrin-reg-done';
 const regForm = document.getElementById('regForm');
+const waitForm = document.getElementById('waitForm');
 const formMsg = document.getElementById('formMsg');
+const waitMsg = document.getElementById('waitMsg');
 const formPanel = document.getElementById('formPanel');
 
 function normalizePhone(raw){
@@ -1640,19 +1763,12 @@ function normalizePhone(raw){
   return s;
 }
 
-function isAlreadyRegistered(){
-  return localStorage.getItem(REG_DONE_KEY) === '1';
-}
-
 function markRegisteredLocal(){
   localStorage.setItem(REG_DONE_KEY, '1');
 }
 
-function applyRegisteredState(){
-  if(!formPanel) return;
-  const done = isAlreadyRegistered();
-  formPanel.classList.toggle('is-registered', done);
-  document.body.classList.toggle('is-registered', done);
+function markWaitlistedLocal(){
+  localStorage.setItem(WAIT_DONE_KEY, '1');
 }
 
 function isUniqueViolation(err){
@@ -1660,12 +1776,18 @@ function isUniqueViolation(err){
   return /23505|duplicate key|unique constraint|already exists/i.test(msg);
 }
 
-applyRegisteredState();
+applyFormMode();
 
 regForm.addEventListener('submit', async function(e){
   e.preventDefault();
   if(isAlreadyRegistered()){
-    applyRegisteredState();
+    applyFormMode();
+    return;
+  }
+  if(isCapacityFull()){
+    applyFormMode();
+    formMsg.textContent = DICT[currentLang].msg_full;
+    formMsg.className = 'err';
     return;
   }
 
@@ -1717,10 +1839,18 @@ regForm.addEventListener('submit', async function(e){
   if(btn) btn.disabled = true;
 
   try{
+    // refresh count before insert to avoid overfilling when possible
+    await refreshSeatCount();
+    if(isCapacityFull()){
+      formMsg.textContent = DICT[currentLang].msg_full;
+      formMsg.className = 'err';
+      applyFormMode();
+      return;
+    }
     await sbInsert('registrations', payload);
     markRegisteredLocal();
-    applyRegisteredState();
     await refreshSeatCount();
+    applyFormMode();
   }catch(err){
     console.error(err);
     if(isUniqueViolation(err)){
@@ -1734,6 +1864,61 @@ regForm.addEventListener('submit', async function(e){
     if(btn) btn.disabled = false;
   }
 });
+
+if(waitForm){
+  waitForm.addEventListener('submit', async function(e){
+    e.preventDefault();
+    if(!isCapacityFull() || isAlreadyRegistered()){
+      applyFormMode();
+      return;
+    }
+
+    waitMsg.textContent = '';
+    waitMsg.className = '';
+
+    const data = new FormData(waitForm);
+    if((data.get('company') || '').toString().trim()){
+      markWaitlistedLocal();
+      applyFormMode();
+      return;
+    }
+
+    const name = (data.get('fullname') || '').toString().trim();
+    const phone = normalizePhone(data.get('phone'));
+    if(!name || phone.length < 10){
+      waitMsg.textContent = DICT[currentLang].msg_err;
+      waitMsg.className = 'err';
+      return;
+    }
+
+    if(!isSupabaseConfigured()){
+      waitMsg.textContent = DICT[currentLang].msg_err;
+      waitMsg.className = 'err';
+      return;
+    }
+
+    const btn = waitForm.querySelector('button[type="submit"]');
+    if(btn) btn.disabled = true;
+    try{
+      await sbInsert('waitlist', { name, phone, lang: currentLang });
+      markWaitlistedLocal();
+      applyFormMode();
+    }catch(err){
+      console.error(err);
+      if(isUniqueViolation(err)){
+        waitMsg.textContent = DICT[currentLang].wait_dup;
+        waitMsg.className = 'err';
+        markWaitlistedLocal();
+        applyFormMode();
+      }else{
+        waitMsg.textContent = DICT[currentLang].msg_err;
+        waitMsg.className = 'err';
+      }
+    }finally{
+      if(btn) btn.disabled = false;
+    }
+  });
+}
 </script>
 </body>
 </html>
