@@ -581,7 +581,7 @@ footer{padding:44px 0;border-top:1px solid var(--border);}
         <div class="hero-stat"><b>12</b><span data-i18n="stat_sessions"></span></div>
         <div class="hero-stat"><b>90<span class="mono" style="font-size:13px"> min</span></b><span data-i18n="stat_length"></span></div>
         <div class="hero-stat"><b>6<span class="mono" style="font-size:13px"> wk</span></b><span data-i18n="stat_weeks"></span></div>
-        <div class="hero-stat"><b>14–22</b><span data-i18n="stat_age"></span></div>
+        <div class="hero-stat"><b>15–25</b><span data-i18n="stat_age"></span></div>
       </div>
       <div class="hero-actions">
         <button class="btn-primary" onclick="document.getElementById('form').scrollIntoView({behavior:'smooth'})" data-i18n="hero_cta_primary"></button>
@@ -762,7 +762,7 @@ footer{padding:44px 0;border-top:1px solid var(--border);}
         </div>
         <div class="field">
           <label data-i18n="f_age"></label>
-          <input type="number" name="age" min="10" max="99" required>
+          <input type="number" name="age" min="15" max="25" required>
         </div>
       </div>
 
@@ -1379,12 +1379,12 @@ regForm.addEventListener('submit', async function(e){
     return;
   }
 
-  const name = (data.get('name') || '').toString().trim();
+  const name = (data.get('fullname') || '').toString().trim();
   const phone = (data.get('phone') || '').toString().trim();
   const ageRaw = data.get('age');
   const age = ageRaw === '' || ageRaw == null ? null : Number(ageRaw);
 
-  if(!name || !phone){
+  if(!name || !phone || !Number.isFinite(age) || age < 15 || age > 25){
     formMsg.textContent = DICT[currentLang].msg_err;
     formMsg.className = 'err';
     return;
